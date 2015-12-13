@@ -12,7 +12,7 @@
  */
  function LifemirrorPlayer(){}
  
- LifemirrorPlayer.prototype.init = function(playlist, latList, lngList, timeList, durationList, annotationlist, annotationTextList, edgeList, weightList, container, baseurl, options) {
+ LifemirrorPlayer.prototype.init = function(playlist, latList, lngList, timeList, durationList, annotationlist, annotationTextList, edgeList, weightList, annotationIdList, annotationKeywordList, container, baseurl, options) {
 
 	this.playlist   = playlist;
     this.container  = container;
@@ -21,6 +21,8 @@
     this.preloaded  = 0;
 	this.annotationlist = annotationlist;
 	this.annotationTextList = annotationTextList;
+	this.annotationIdList = annotationIdList;
+	this.annotationKeywordList = annotationKeywordList;
 	this.timeList = timeList;
 	this.durationList = durationList;
 	this.latList = latList;
@@ -46,46 +48,50 @@ var playingNow;
 
 
 LifemirrorPlayer.prototype.preloadVideos = function() {
-    for(var index=0;index<this.playlist.length;index++)
-	//for(var index in this.playlist)
-    {
+    for(var index=0;index<this.playlist.length;index++) {
         // Prepare HTML to insert
         // This is necessary to prevent the browser closing tags
-        var htmlToInsert = "<video controls height='65%' preload oncanplaythrough='lifemirror.preloaderCallback()' onpause='lifemirror.videoCallback(\""+this.playlist[index]+"\")' id='"+ this.playlist[index]+"' style='display:none' "+this.options+">";
+        var htmlToInsert = "<video controls height='55%' preload oncanplaythrough='lifemirror.preloaderCallback()' onpause='lifemirror.videoCallback(\""+this.playlist[index]+"\")' id='"+ this.playlist[index]+"' style='display:none; margin-bottom:2%;' "+this.options+">";
         //htmlToInsert += "<source src='"+Lifemirror.baseurl+Lifemirror.playlist[index]+"/video.mp4' type='video/mp4'>";
         //htmlToInsert += "<source src='"+Lifemirror.baseurl+Lifemirror.playlist[index]+"/video.ogg' type='video/ogg'>";
 		htmlToInsert += "<source src='"+this.playlist[index]+"' type='video/mp4'>";
         //htmlToInsert += "<source src='"+Lifemirror.playlist[index]+"' type='video/ogg'>";
-        htmlToInsert += "</video>";
+        htmlToInsert += "</video><div id=\""+index+"\" style=\"display:none;\" ><button class=\"btn btn-default btn-block backbtn\" data-info ='"+index+"' style=' float:left; width:25%; display:block;'>Previous</button>";
+		htmlToInsert += "<button class=\"btn btn-default btn-block nextbtn\" data-info ='"+index+"' style=' float:right; width:25%; display:block;'>Next </button></div>";
+		htmlToInsert +="<div id ='"+this.annotationIdList[index]+"' data-info= '"+annotationKeywordList[index]+"' style='display:none; font-size:18px; text-align:center; margin-top: 8%;'>";
+		var idSplit = this.annotationKeywordList[index].split(" ");
 		
-		/*var annotationHtmlToInsert = "<span \" class=\"list-group-item\">";
-		annotationHtmlToInsert += "<a href=\"javascript:void(0)\" id='"+this.annotationlist[index]+"' title='"+this.annotationTextList[index]+"' onclick='lifemirror.playVideo(\""+this.playlist[index]+"\")'>";
-		//onclick='clicked("+this+");'
-		annotationHtmlToInsert += this.annotationlist[index]+" ("+this.weightList[index]+")";
-		//annotationHtmlToInsert += "onclick='lifemirror.videoCallback(\""+this.playlist[index]+"\")'"
-		//annotationHtmlToInsert +="<br>"
-		//annotationHtmlToInsert += this.annotationTextList[index];
-		annotationHtmlToInsert += "</a>";
-		//annotationHtmlToInsert += '<a href="javascript:void(0)" id="recommend" name="'+this.edgeList[index]+'">Recommend</a>';
-		//annotationHtmlToInsert += '<a href="javascript:void(0)" onclick="recommend(\"'+this.edgeList[index]+'\")">Recommend</a>';
+		for(i=0;i<idSplit.length;i++){
+			htmlToInsert += "<span style='margin-right: 3%;' class=\"label label-info\">"+idSplit[i]+" </span>";
+		}
 		
-		/*annotationHtmlToInsert += "<select id=\""+this.edgeList[index]+"\" class=\"1-n\"></select>";
-		annotationHtmlToInsert += "<a href=\"javascript:void(0)\" id=\""+this.edgeList[index]+"\" onclick='recommend(\""+this.edgeList[index]+"\")'>Recommend</a>";*/
-		
-		/*var edge = this.edgeList[index];
-		
-		annotationHtmlToInsert += "<span class=\"rating\"><input type=\"radio\" name=\""+edge+"\" id=\"4_"+edge+"_stars\" value=\"4\" onclick=\"recommend("+edge+",4)\"> <label class=\"lbl"+edge+" stars\" for=\"4_"+edge+"_stars\"></label> <input type=\"radio\" name=\""+edge+"\" id=\"3_"+edge+"_stars\" value=\"3\" onclick=\"recommend("+edge+",3)\"> <label class=\"lbl"+edge+" stars\" for=\"3_"+edge+"_stars\"></label> <input type=\"radio\" name=\""+edge+"\" id=\"2_"+edge+"_stars\" value=\"2\" onclick=\"recommend("+edge+",2)\"> <label class=\"lbl"+edge+" stars\" for=\"2_"+edge+"_stars\"></label> <input type=\"radio\" name=\""+edge+"\" id=\"1_"+edge+"_stars\" value=\"1\" onclick=\"recommend("+edge+",1)\"> <label class=\"lbl"+edge+" stars\" for=\"1_"+edge+"_stars\"></label> <input type=\"radio\" name=\""+edge+"\" id=\"0_"+edge+"_stars\" value=\"0\" onclick=\"recommend("+edge+",0)\" required> <label class=\"lbl"+edge+" stars\" for=\"0_"+edge+"_stars\"></label></span></span>";*/
-		
-		
-		
-		
+		//htmlToInsert += "<br>";
+		htmlToInsert +="<input type=\"textbox\" style='width:50%; display:block; margin-top:2%;' class=\"form-control new-tag\" placeholder=\"Enter new tag here...\">";
+		htmlToInsert +="<button type=\"button\" style='width:50%; display:block;' class=\"btn btn-default btn-block add-tag\">Add</button>";
+		htmlToInsert +="</div>";
+
 		var url = this.playlist[index];
 		var filename = url.substring(url.lastIndexOf('/')+1);
 		filename = filename.substr(0, filename.indexOf('#')); 
-		console.log("FILENAME: "+filename);
+		//console.log("FILENAME: "+filename);
 		var num = +this.durationList[index] + +this.timeList[index];
 		
-		var videoCaption = "<span id='"+ this.timeList[index]+"' style='display:none'>Showing "+filename+" from "+ this.timeList[index]+" secs to " +num+" secs. </span>"
+		//var videoCaption = "<span id='"+ this.timeList[index]+"' style='display:none'>Showing "+filename+" from "+ this.timeList[index]+" secs to " +num+" secs. </span>"
+		
+		var fromMinutes = pad2(Math.floor(this.timeList[index] / 60));
+		var fromSeconds = pad2(this.timeList[index] - fromMinutes * 60);
+		
+		var toMinutes = pad2(Math.floor(num / 60));
+		var toSeconds = pad2(num - toMinutes * 60);
+		
+		var videoCaption = "<span id='"+ this.timeList[index]+"' style='display:none; font-size:18px;'>";
+		videoCaption += "<span >"+filename+"  </span>";
+		videoCaption += "<span class=\"label label-info\">"+fromMinutes+":"+fromSeconds+" </span>";
+		videoCaption += "<span>&nbsp;   -   </span>";
+		videoCaption += "<span class=\"label label-info\">"+toMinutes+":"+toSeconds+" </span>";
+		videoCaption += "</span>";
+		
+		
 		
         // Insert the HTML
 		document.getElementById("videonamedisplay").innerHTML += videoCaption;
@@ -102,6 +108,116 @@ LifemirrorPlayer.prototype.preloadVideos = function() {
 		
     }
 	
+	$(".add-tag").click(function(event){
+		var parent = $(this).parent();
+		var annotationId = parent.attr("id");
+		var oldTags = parent.attr("data-info");
+		var newTag = parent.find('.new-tag').val();
+		//console.log("annotationId: "+annotationId+" Tag Value: "+newTag+" Old Tags: "+oldTags);
+		
+		//setTag(oldTags+" "+newTag, annotationId);
+		var tags=oldTags+" "+newTag;
+		
+		$.ajax({
+
+			url: "http://eiche.informatik.rwth-aachen.de:7073/annotations/objects/"+annotationId,
+			type: "PUT",
+			//dataType:'application/json',
+			contentType: "application/json",
+			data: "{\"keywords\":"+ tags+"}",
+			success: function(value) {
+				$("<span style='margin-right: 2%;' class=\"label label-info\">"+newTag+" </span>" ).prependTo(parent);
+				parent.find('.new-tag').val("");
+				//console.log("Tags updated: "+newTag);
+			},
+			statusCode: {
+				401: function() {
+					alert("ERROR! Please login again.");
+				},
+				404: function() {
+					alert("ERROR! Please login again.");
+				}
+				
+			},
+			error: function(e){console.log(e);}
+		});
+		
+		
+	});
+	
+	$(".nextbtn").click(function(event){
+		
+		var nextIndex = $(this).attr("data-info");
+		lifemirror.getNext(nextIndex);
+	});
+	
+	$(".backbtn").click(function(event){
+		
+		var prevIndex = $(this).attr("data-info");
+		lifemirror.getPrevious(prevIndex);
+	});
+	
+	
+}
+
+LifemirrorPlayer.prototype.getPrevious = function(prevIndex) {
+
+	////console.log("Next Index: "+nextIndex+" Length: "+this.playlist.length);
+	var intIndex = parseInt(prevIndex);
+	intIndex-=1;
+	if(intIndex >= 0){
+		
+		////console.log("next btn: "+this.playlist[intIndex]);
+		
+		var intent = {
+		"component":"",
+		"sender":"",
+		"data":this.playlist[intIndex],
+		"dataType":"text/xml",
+		"action":"onNextClick",
+		"categories":["category1","category2"],
+		"flags":["PUBLISH_LOCAL"],
+		"extras":{"a":"a"}
+		}
+					
+		if(iwc.util.validateIntent(intent)){
+			client.publish(intent);
+		}
+		
+		this.playVideo(this.playlist[intIndex]);
+	}
+	
+	
+}
+
+
+LifemirrorPlayer.prototype.getNext = function(nextIndex) {
+
+	//console.log("Next Index: "+nextIndex+" Length: "+this.playlist.length);
+	var intIndex = parseInt(nextIndex);
+	intIndex+=1;
+	if(intIndex < this.playlist.length){
+		
+		//console.log("next btn: "+this.playlist[intIndex]);
+		
+		var intent = {
+		"component":"",
+		"sender":"",
+		"data":this.playlist[intIndex],
+		"dataType":"text/xml",
+		"action":"onNextClick",
+		"categories":["category1","category2"],
+		"flags":["PUBLISH_LOCAL"],
+		"extras":{"a":"a"}
+		}
+					
+		if(iwc.util.validateIntent(intent)){
+			client.publish(intent);
+		}
+		
+		this.playVideo(this.playlist[intIndex]);
+	}
+	
 	
 }
 
@@ -109,9 +225,16 @@ LifemirrorPlayer.prototype.startPlaying = function() {
     var object = document.getElementById(this.playlist[0]);
 	// //var annObject = document.getElementById(this.annotationlist[0]);
 	var name = document.getElementById(this.timeList[0]);
+	var keywords = document.getElementById(this.annotationIdList[0]);
+	var next = document.getElementById(0);
 	updateMap(this.latList[0],this.lngList[0]);
-    object.style.display = 'inline';
-	name.style.display = 'inline';
+    
+	if(object!=null){
+		object.style.display = 'inline';
+		name.style.display = 'inline';
+		keywords.style.display = 'block';
+		next.style.display = 'inline';
+	}
 	//annObject.style.display = 'inline';
 	// //annObject.style.backgroundColor = '#5BC0DE';
 	// //annObject.style.color = '#333';
@@ -134,6 +257,8 @@ LifemirrorPlayer.prototype.playVideo = function(id) {
 	// Hide current object
 	document.getElementById(playingNow).style.display = 'none';
 	document.getElementById(this.timeList[index]).style.display = 'none';
+	document.getElementById(this.annotationIdList[index]).style.display = 'none';
+	document.getElementById(index).style.display = 'none';
 
 	// Get the next object in array
 	index = this.playlist.indexOf(id);
@@ -141,14 +266,21 @@ LifemirrorPlayer.prototype.playVideo = function(id) {
 	// Show next video
 	var object = document.getElementById(this.playlist[index]);
 	var name = document.getElementById(this.timeList[index]);
+	var keywords = document.getElementById(this.annotationIdList[index]);
+	var next = document.getElementById(index);
+	//console.log("Index before inline: "+next);
 	
 	//google.maps.event.moveMarker(map, marker0,50.75968 , 6.0965247);
 	updateMap(this.latList[index],this.lngList[index]);
 	//moveMarker(map, marker, 50, 7);
 	
 	//if(index < Lifemirror.playlist.length){
+	if(object!=null){
 		object.style.display = 'inline';
 		name.style.display = 'inline';
+		keywords.style.display = 'block';
+		next.style.display = 'inline';
+	}
 		//annobject.style.display = 'inline';
 		// //annObject.style.backgroundColor = '#5BC0DE';
 		// //annObject.style.color = '#333';
@@ -167,61 +299,70 @@ LifemirrorPlayer.prototype.playVideo = function(id) {
 
 LifemirrorPlayer.prototype.videoCallback = function(id) {
 	
-    var pausetime = document.getElementById(id).currentTime;
-	console.log(pausetime);
-	var start_time = id.match(/#t=(.*),/);
-	var end_time = id.match(/,(.*)/);
-	//alert (start_time[1]+","+end_time[1]);
-	
-	sendIntent("onPause", id, pausetime)
-	
-	if(pausetime>=end_time[1]) {
+    if(document.getElementById(id)!=null){
+		var pausetime = document.getElementById(id).currentTime;
+		//console.log(pausetime);
+		var start_time = id.match(/#t=(.*),/);
+		var end_time = id.match(/,(.*)/);
+		//alert (start_time[1]+","+end_time[1]);
 		
-		var index = this.playlist.indexOf(id);
-		console.debug("pausetime>=19");
-		//console.debug("INDEX: "+index);
-		//console.debug("LENGTH: "+this.playlist.length);
-		if(index+1 < this.playlist.length){
-			// Hide current object
-			document.getElementById(id).style.display = 'none';
-			document.getElementById(this.timeList[index]).style.display = 'none';
-
-			// Find next object in array
-			index += 1;
-			
-			
-			// hide the previous annotation
-			//document.getElementById(Lifemirror.annotationlist[index-1]).style.display = 'none';
-			// //document.getElementById(this.annotationlist[index-1]).style.backgroundColor = 'transparent';
-			//document.getElementById(this.annotationlist[index-1]).style.color = '#FFFFFF';
-			//index = 0;
-
-			// Show next video
-			var object = document.getElementById(this.playlist[index]);
-			// //var annObject = document.getElementById(this.annotationlist[index]);
-			var name = document.getElementById(this.timeList[index]);
-			
-			//google.maps.event.moveMarker(map, marker0,50.75968 , 6.0965247);
-			updateMap(this.latList[index],this.lngList[index]);
-			//moveMarker(map, marker, 50, 7);
-			
-			//if(index < Lifemirror.playlist.length){
-				object.style.display = 'inline';
-				name.style.display = 'inline';
-				//annobject.style.display = 'inline';
-				// //annObject.style.backgroundColor = '#5BC0DE';
-				// //annObject.style.color = '#333';
-				playingNow = this.playlist[index];
-				object.play();
-			//}
-		}
-		else{
-			// //var annObject = document.getElementById(this.annotationlist[index]);
-			// //annObject.style.backgroundColor = 'transparent';
-			// //annObject.style.color = '#FFFFFF'
-			
-			// //document.getElementById("end").style.backgroundColor = '#5BC0DE';
+		sendIntent("onPause", id, pausetime);
 		
+		if(pausetime>=end_time[1]) {
+			
+			var index = this.playlist.indexOf(id);
+			console.debug("pausetime>=19");
+			//console.debug("INDEX: "+index);
+			//console.debug("LENGTH: "+this.playlist.length);
+			if(index+1 < this.playlist.length){
+				// Hide current object
+				document.getElementById(id).style.display = 'none';
+				document.getElementById(this.timeList[index]).style.display = 'none';
+				document.getElementById(this.annotationIdList[index]).style.display = 'none';
+				document.getElementById(index).style.display = 'none';
+				
+				// Find next object in array
+				index += 1;
+				
+				
+				// hide the previous annotation
+				//document.getElementById(Lifemirror.annotationlist[index-1]).style.display = 'none';
+				// //document.getElementById(this.annotationlist[index-1]).style.backgroundColor = 'transparent';
+				//document.getElementById(this.annotationlist[index-1]).style.color = '#FFFFFF';
+				//index = 0;
+
+				// Show next video
+				var object = document.getElementById(this.playlist[index]);
+				// //var annObject = document.getElementById(this.annotationlist[index]);
+				var name = document.getElementById(this.timeList[index]);
+				var keywords = document.getElementById(this.annotationIdList[index]);
+				var next = document.getElementById(index);
+				//google.maps.event.moveMarker(map, marker0,50.75968 , 6.0965247);
+				updateMap(this.latList[index],this.lngList[index]);
+				//moveMarker(map, marker, 50, 7);
+				
+				//if(index < Lifemirror.playlist.length){
+				if(object!=null){
+					object.style.display = 'inline';
+					name.style.display = 'inline';
+					keywords.style.display = 'block';
+					next.style.display = 'inline';
+				}
+					//annobject.style.display = 'inline';
+					// //annObject.style.backgroundColor = '#5BC0DE';
+					// //annObject.style.color = '#333';
+					playingNow = this.playlist[index];
+					object.play();
+				//}
+			}
+			else{
+				// //var annObject = document.getElementById(this.annotationlist[index]);
+				// //annObject.style.backgroundColor = 'transparent';
+				// //annObject.style.color = '#FFFFFF'
+				
+				// //document.getElementById("end").style.backgroundColor = '#5BC0DE';
+			
+			}
 		}
 	}
 }
@@ -260,57 +401,14 @@ function flushLists(){
 	lngList = [];
 	edgeList = [];
 	weightList = [];
+	annotationKeywordList = [];
+	annotationIdList = [];
 }
-
-
-
-/*function recommend(edgeid, weight) {
-	
-	console.log(edgeid);
-	var style = document.createElement('style');
-	style.type = 'text/css';
-	//style.innerHTML = 'input[type="radio"], .rating label.stars { float: right; line-height: 30px; height: 30px; }';
-	style.innerHTML = '.rating label.lbl'+edgeid+':hover ~ label.lbl'+edgeid+', rating label.lbl'+edgeid+':hover, .rating input[type=radio][name=\''+edgeid+'\']:checked ~ label.lbl'+edgeid+' { background-image: url(\'http://www.findsourcecode.com/wp-content/uploads/2014/04/star.png\'); counter-increment: checkbox; }';
-	
-	//style.innerHTML = '.rating label.lbl'+edgeid+':hover ~ label.lbl'+edgeid+', rating label.lbl'+edgeid+':hover, .rating input[type=radio][name=stars]:checked ~ label.lbl'+edgeid+' { background-image: url(\'http://www.findsourcecode.com/wp-content/uploads/2014/04/star.png\'); counter-increment: checkbox; } .rating input[type=radio][name=stars]:required + label.stars:after { content: counter(checkbox)';
-	
-	//style.innerHTML += '.rating label.stars:hover ~ label.stars, rating label.stars:hover, .rating input[type=radio][name=\''+edgeid+'\']:checked ~ label.stars { background-image: url(\'http://www.findsourcecode.com/wp-content/uploads/2014/04/star.png\'); counter-increment: checkbox; } .rating input[type=radio][name=\''+edgeid+'\']:required + label.stars:after { content: counter(checkbox);';
-	
-	
-	document.getElementsByTagName('head')[0].appendChild(style);
-	
-	console.log(weight+ " tada :D");
-	
-	//var edgeid = $(this).attr('name');
-	//var weight = document.getElementById(edgeid).value;
-	//console.log("weight: "+weight);
-	$.ajax({
-
-		url: "http://eiche.informatik.rwth-aachen.de.informatik.rwth-aachen.de:7076/analytics/recommend?username="+oidc_userinfo["preferred_username"]+"&edge="+edgeid+"&weight="+weight,
-		type: "POST",
-		dataType:'text',
-		
-		success: function(value) {
-			console.log("success");
-		},
-		statusCode: {
-			401: function() {
-				alert("ERROR! Please login again.");
-			},
-			404: function() {
-				alert("ERROR! Please login again.");
-			}
-			
-		},
-		error: function(e){console.log(e);}
-	});
-
-}*/      
 
 
 function postGetVideos(value){
 
-	console.log(value);
+	//console.log(value);
 					
 	var jsonData = JSON.parse(value);
 
@@ -325,6 +423,8 @@ function postGetVideos(value){
 		var longitude = videos.Longitude.toString();
 		var edge = videos.edgeId.toString();
 		var weight = videos.weight.toString();
+		var annotationKeyword = videos.keywords.toString();
+		var annotationId = videos.id.toString();
 		videoplaylist.push(videoUri);
 		annotationlist.push(title);
 		annotationTextList.push(text);
@@ -334,22 +434,13 @@ function postGetVideos(value){
 		lngList.push(longitude);
 		edgeList.push(edge);
 		weightList.push(weight);
+		annotationKeywordList.push(annotationKeyword);
+		annotationIdList.push(annotationId);
 	}
 	
-	/*var list = [];
-	list.push(annotationlist);
-	list.push(annotationTextList);
-	list.push(edgeList);
-	list.push(weightList);
 	
-	sendIntent("annotationData",list);*/
 	
-	/*sendIntent("annotationlistIntent",annotationlist);
-	sendIntent("annotationTextListIntent",annotationTextList);
-	sendIntent("edgeListIntent",edgeList);
-	sendIntent("weightListIntent",weightList);*/
-	
-	console.log(annotationlist[0]);
+	//console.log(annotationlist[0]);
 	/*$('html,body').animate({
 	scrollTop: $("#annotationdisplay").offset().top},'slow');*/
 	playVideos();
@@ -366,7 +457,7 @@ function playVideos(){
 	var base = "random";
 	var options = "";
 	
-	lifemirror.init(videoplaylist, latList, lngList, timeList, durationList, annotationlist, annotationTextList, edgeList, weightList, "videodisplay", base, options);
+	lifemirror.init(videoplaylist, latList, lngList, timeList, durationList, annotationlist, annotationTextList, edgeList, weightList, annotationIdList, annotationKeywordList, "videodisplay", base, options);
 	
 	lifemirror.preloadVideos();
 	lifemirror.startPlaying();
@@ -390,20 +481,6 @@ function updateMap(lt,ln) {
 	if(iwc.util.validateIntent(intent)){
 		client.publish(intent);
 	}
-	
-    /*var myLatLng = new google.maps.LatLng( lt,ln ),
-        myOptions = {
-            zoom: 4,
-            center: myLatLng,
-			disableDefaultUI: true,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
-            },
-        map = new google.maps.Map( document.getElementById( 'map-canvas' ), myOptions ),
-        marker = new google.maps.Marker( {position: myLatLng, map: map} );
-    
-    marker.setMap( map );
-    //moveMarker( map, marker );
-    */
 }
 
 window.mobilecheck = function() {
@@ -415,7 +492,7 @@ window.mobilecheck = function() {
 function sendIntent(action, data, pauseTime){
 
 	//client = new iwc.Client();
-	console.log("player widget: inside sendIntent");
+	//console.log("player widget: inside sendIntent");
 
 	var intent = {
 		"component":"",
@@ -431,6 +508,18 @@ function sendIntent(action, data, pauseTime){
 	if(iwc.util.validateIntent(intent)){
 		client.publish(intent);
 	}
+}
+
+function pad2(number) {
+   
+     return (number < 10 ? '0' : '') + number
+   
+}
+
+function pad2(number) {
+   
+     return (number < 10 ? '0' : '') + number
+   
 }
 
 

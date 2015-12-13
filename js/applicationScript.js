@@ -32,50 +32,19 @@
 
 var client;
 
-/*var init = function() {
-  
-	client = new iwc.Client();
-	  
-	var iwcCallback = function(intent) {
-		// define your reactions on incoming iwc events here
-		console.log("Search widget: "+intent);
-		if (intent.action == "search_intent"){
-			console.log("Search widget Inside: "+intent);
-		}
-	};
-	client.connect(iwcCallback);
-  
-	//client = new Las2peerWidgetLibrary("http://127.0.0.1:7077/userpreferences", iwcCallback);
-  
-	//gadgets.util.registerOnLoadHandler(init);
-  
-}*/
-
-
-// getPreferences
-/*var getPreferences = function(){
-  var preferences = null;
-  var preferences = null;
-  client.sendRequest("GET", "127.0.0.1:7077", preferences, "application/json", {}, true,
-  function(data, type) {
-    console.log(data);
-  },
-  function(error) {
-    console.log(error);
-  });
-  return preferences;
-}*/
-
 
 $(document).ready(function() {
 	//init();	
+	
+	
+	
 	client = new iwc.Client();
 	  
 	var iwcCallback = function(intent) {
 		// define your reactions on incoming iwc events here
-		console.log("Player widget"+intent.data);
+		//console.log("Player widget"+intent.data);
 		if (intent.action == "getVideos"){
-			console.log("Player widget Inside: "+intent.data);
+			//console.log("Player widget Inside: "+intent.data);
 			document.getElementById("videonamedisplay").innerHTML = "";
 			document.getElementById("videodisplay").innerHTML = "";
 			//document.getElementById("annotationdisplay").innerHTML = "";
@@ -92,22 +61,18 @@ $(document).ready(function() {
 	};
 	client.connect(iwcCallback);
 	
-	console.log("In callback Player widget");
+	//console.log("In callback Player widget");
 	if(localStorage.access_token!=null){
-		
-		console.log("callback Success");
-		
-		
+	
+		//$("#addTagbtn").click(function(event){
 		
 		
+		//console.log("callback Success");
 		
 	} else {
 		console.log("not signed in...");
-		console.log(result);
-		$("#status").html("Do I know you?!");
+		//console.log(result);
+		//$("#status").html("Do I know you?!");
 	}
-	
-	
-
   
 });

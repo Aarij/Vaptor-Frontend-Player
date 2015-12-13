@@ -2,7 +2,7 @@
 <Module>
   <ModulePrefs title="Player" description="Display the Videos"
     author="Aarij" author_email="siddiqui@dbis.rwth-aachen.de"
-    width="700" height="600">
+    width="620" height="600">
 
     <Require feature="opensocial-0.8"></Require>
     <Require feature="openapp"></Require>
@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<!-- Bootstrap stylesheet import -->
 	<link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 	<!-- own style information -->
-	<!--<link rel="stylesheet" href="http://CAE-Community-Application-Editor.github.io/frontendComponent-UserPreferencesWidget/css/style.css">-->
+	<link rel="stylesheet" href="http://eiche.informatik.rwth-aachen.de/siddiqui/widgets/Vaptor-Frontend-Player/css/style.css">
 
 	
 	
@@ -84,10 +84,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<!-- additional widget specific imports (put your own imports here as well) -->
 
 	<!-- import the client library -->
-	<script type="text/javascript" src="http://localhost:8085/Vaptor-Frontend-Player/js/lib/las2peerWidgetLibrary.js"></script>
+	<script type="text/javascript" src="http://eiche.informatik.rwth-aachen.de/siddiqui/widgets/Vaptor-Frontend-Player/js/lib/las2peerWidgetLibrary.js"></script>
 	<!-- import application script -->
 	
-	<script type="text/javascript" src="http://localhost:8085/Vaptor-Frontend-Player/js/applicationScript.js"></script>
+	<script type="text/javascript" src="http://eiche.informatik.rwth-aachen.de/siddiqui/widgets/Vaptor-Frontend-Player/js/applicationScript.js"></script>
 	
 	
 	
@@ -95,30 +95,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   
 </head>
 <body>
-	<script src="http://localhost:8085/Vaptor-Frontend-Player/js/LifemirrorPlayer.js"></script>
+	<script src="http://eiche.informatik.rwth-aachen.de/siddiqui/widgets/Vaptor-Frontend-Player/js/LifemirrorPlayer.js"></script>
 	
 	<!-- inter widget communication library import -->
-	<script type="text/javascript" src="http://localhost:8085/Vaptor-Frontend-Player/js/lib/iwc.js"></script>
+	<script type="text/javascript" src="http://eiche.informatik.rwth-aachen.de/siddiqui/widgets/Vaptor-Frontend-Player/js/lib/iwc.js"></script>
 	
 	
 
 	<!-- container for actual page content -->
 	<div class="container" id="main-content">
 	
-        <!--<div class="row" style="padding: 5px;">
-            <div class="col-sm-4">
-				<div class="bottom_space row">
-                    <span style="font-size: 40px; text-align: left;">VAPTOR!</span>
-				</div>
-			</div>
-		</div>-->
+        
 		<div class="row" style="padding: 5px;">
 			<div class="col-sm-7">
                 <div id="videonamedisplay" style ="text-align: center;"></div>
                 <div id="videodisplay" class="row" style="text-align:center">
-                    <video height='65%' controls>
+                    <!--<video height='65%' controls>
                         <source src="http://techslides.com/demos/sample-videos/small.mp4" type="video/mp4">
                     </video>
+					<div><span>Welcome to Vaptor!</span></div>-->
                 </div>
             </div>
 		</div>
